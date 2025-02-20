@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);1591</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Folder Include="Api\Controllers\" />
+        <Folder Include="Api\Mappings\" />
+        <Folder Include="Api\Middleware\" />
+        <Folder Include="Api\Models\Наим_контроллера\Requests\" />
+        <Folder Include="Api\Models\Наим_контроллера\Responses\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Core\Entities\" />
+        <Folder Include="Infrastructure\Data\Configurations\" />
+        <Folder Include="Infrastructure\Data\Migrations\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MassTransit.RabbitMQ" Version="8.2.3" />
+        <Folder Include="Infrastructure\RabbitConsumers\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Core\Attributes\" />
+        <Folder Include="Core\Configurations\" />
+        <Folder Include="Core\Constants\" />
+        <Folder Include="Core\Exceptions\" />
+        <Folder Include="Core\Extensions\" />
+        <Folder Include="Core\Helpers\" />
+        <Folder Include="Core\Mappings\" />
+        <Folder Include="Core\Models\Internal\" />
+        <Folder Include="Core\Services\Implementations\" />
+        <Folder Include="Core\Services\Interfaces\" />
+        <Folder Include="Infrastructure\Models\ExternalServices\Наименование_Внешнего_Сервиса\Requests\" />
+        <Folder Include="Infrastructure\Models\ExternalServices\Наименование_Внешнего_Сервиса\Responses\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="WebUtilities" Version="8.0.0" />
+    </ItemGroup>
+    
+</Project>
