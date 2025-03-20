@@ -7,5 +7,5 @@ public interface IPlayerService
     public IEnumerable<Player> GetAll();
     public Player? Get(string characterName);
     public Player Add(Player player);
-    public int Delete(Player player);
+    public int Delete(int id);
 }

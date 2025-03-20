@@ -27,7 +27,7 @@ public class PlayersController : ControllerBase
 
     [HttpGet]
     [Route("Get")]
-    public Player GetEvent(string characterName)
+    public Player? Get(string characterName)
     {
         return _playerService.Get(characterName);
     }
@@ -37,5 +37,12 @@ public class PlayersController : ControllerBase
     public Player Add(Player player)
     {
         return _playerService.Add(player);
+    }
+
+    [HttpDelete]
+    [Route("Delete")]
+    public int Delete(int id)
+    {
+        return _playerService.Delete(id);
     }
 }

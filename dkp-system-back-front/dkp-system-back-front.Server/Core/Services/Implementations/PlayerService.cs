@@ -21,12 +21,17 @@ public class PlayerService : IPlayerService
         return player;
     }
 
-    public int Delete(Player player)
+    public int Delete(int id)
     {
-        _db.Players.Remove(player);
-        _db.SaveChanges();
+        Player? player = _db.Players.Find(id);
+        if (player != null)
+        {
+            _db.Players.Remove(player);
+            _db.SaveChanges();
+            return player.Id;
+        }
 
-        return player.Id;
+        return -1;
     }
 
     public IEnumerable<Player> GetAll()

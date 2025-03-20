@@ -59,6 +59,22 @@
     </div>
   </div>
 
+  <!-- Удаление игрока -->
+  <div class="card mb-4">
+    <div class="card-header">Удаление по id персонажа</div>
+    <div class="card-body">
+      <div class="input-group">
+        <input type="text"
+               class="form-control"
+               placeholder="Введите имя персонажа"
+               [(ngModel)]="deleteCharacterId"
+               name="deleteCharacterId">
+        <!-- (click)="onSearchPlayer()" - вызов метода при клике -->
+        <button (click)="onDeletePlayer()" class="btn btn-secondary">Удалить</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Кнопка для получения всех игроков -->
   <div class="mb-4">
     <button (click)="onGetAllPlayers()" class="btn btn-info">Показать всех игроков</button>

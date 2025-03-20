@@ -23,6 +23,9 @@ export class AppComponent {
   // Поле для поиска
   searchCharacterName: string = '';
 
+  // Поле для удаления
+  deleteCharacterId?: number = undefined;
+
   // Строка, куда будем выводить результат
   result: string = '';
 
@@ -55,6 +58,30 @@ export class AppComponent {
       });
   }
 
+  /** Удалить игрока */
+  onDeletePlayer() {
+    const searchValue = this.deleteCharacterId;
+    if (!searchValue) {
+      this.result = '<div class="alert alert-warning">Введите id персонажа для удаления.</div>';
+      return;
+    }
+
+    // Делаем POST-запрос через HttpClient
+    this.http.delete(`${this.apiBaseUrl}/Players/Delete?id=${encodeURIComponent(searchValue)}`)
+      .subscribe({
+        next: () => {
+          this.result = '<div class="alert alert-success">Игрок успешно удален!</div>';
+          // Очищаем поля формы
+          this.firstName = '';
+          this.lastName = '';
+          this.characterName = '';
+        },
+        error: (err) => {
+          this.result = `<div class="alert alert-danger">Ошибка при удалении игрока: ${err.message}</div>`;
+        }
+      });
+  }
+
   /** Найти игрока по имени персонажа */
   onSearchPlayer() {
     const searchValue = this.searchCharacterName.trim();
@@ -70,8 +97,8 @@ export class AppComponent {
             this.result = `
               <div class="card">
                 <div class="card-body">
-                  <h5 class="card-title">${player.name} ${player.surname}</h5>
                   <p class="card-text">Персонаж: ${player.characterName}</p>
+                  <h5 class="card-title">${player.name} ${player.surname}</h5>
                 </div>
               </div>
             `;
@@ -97,7 +124,7 @@ export class AppComponent {
           let html = '<h3>Список игроков:</h3><ul class="list-group">';
           players.forEach((player) => {
             html += `<li class="list-group-item">
-              <strong>${player.name} ${player.surname}</strong> - Персонаж: ${player.characterName}
+              <strong>${player.id}: ${player.characterName}</strong> - ${player.name} ${player.surname}
             </li>`;
           });
           html += '</ul>';
