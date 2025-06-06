@@ -5,9 +5,11 @@ VisualStudioVersion = 17.8.34322.80
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dkp-system", "dkp-system\dkp-system.csproj", "{994D0DD2-3CDE-4E9B-9232-74B938F56C5F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dkp-system-back-front.Server", "dkp-system-back-front\dkp-system-back-front.Server\dkp-system-back-front.Server.csproj", "{01228F0B-84BA-4CA5-95F3-2901BD73F7D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dkp-system-back-front.Server", "dkp-system-back-front\dkp-system-back-front.Server\dkp-system-back-front.Server.csproj", "{01228F0B-84BA-4CA5-95F3-2901BD73F7D4}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "dkp-system-back-front.client", "dkp-system-back-front\dkp-system-back-front.client\dkp-system-back-front.client.esproj", "{DF378C44-C285-4E9E-8017-C29D7F3A63A4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dkp-system-back-front.Server.Test", "dkp-system-back-front.Server.Test\dkp-system-back-front.Server.Test.csproj", "{72F8DDEC-47FD-42F3-B3BE-20C767624B34}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +31,10 @@ Global
 		{DF378C44-C285-4E9E-8017-C29D7F3A63A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF378C44-C285-4E9E-8017-C29D7F3A63A4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DF378C44-C285-4E9E-8017-C29D7F3A63A4}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{72F8DDEC-47FD-42F3-B3BE-20C767624B34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72F8DDEC-47FD-42F3-B3BE-20C767624B34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72F8DDEC-47FD-42F3-B3BE-20C767624B34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72F8DDEC-47FD-42F3-B3BE-20C767624B34}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
