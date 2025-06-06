@@ -1,6 +1,13 @@
-﻿using dkp_system_back_front.Server.Core.Models;
+﻿using System.Security.Claims;
+using dkp_system_back_front.Server.Core.Models.Internal;
+using dkp_system_back_front.Server.Core.Services.Implementations;
 using dkp_system_back_front.Server.Core.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using dkp_system_back_front.Server.Core.Models.Internal.Guild;
 
 namespace dkp_system_back_front.Server.Api.Controllers;
 [ApiController]
@@ -8,32 +15,27 @@ namespace dkp_system_back_front.Server.Api.Controllers;
 public class EventsController : ControllerBase
 {
     private readonly ILogger<EventsController> _logger;
-    private readonly IEventTypeService _eventTypeService;
+    private readonly IEventService _eventService;
+    private readonly IPlayerService _playerService;
 
-    public EventsController(ILogger<EventsController> logger, IEventTypeService eventTypeService)
+    public EventsController(ILogger<EventsController> logger, IEventService eventTypeService, IPlayerService playerService)
     {
         _logger = logger;
-        _eventTypeService = eventTypeService;
+        _eventService = eventTypeService;
+        _playerService = playerService;
     }
 
-    [HttpGet]
-    [Route("GetAll")]
-    public IEnumerable<EventType> GetAll()
+    [Authorize(AuthenticationSchemes = "Identity.Application")]
+    [HttpPost("submit-dkp")]
+    public async Task<IActionResult> SubmitDKPCode([FromBody] SubmitDKPRequest request)
     {
-        return _eventTypeService.GetAll();
-    }
+        string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-    [HttpGet]
-    [Route("Get")]
-    public EventType GetEvent(int id)
-    {
-        return _eventTypeService.GetEvent(id);
-    }
+        var member = await _playerService.FindByUserIdAsync(userId);
+        if (member == null) return NotFound("Player not found");
 
-    [HttpPost]
-    [Route("Add")]
-    public EventType Add(EventType eventType)
-    {
-        return _eventTypeService.Add(eventType);
+        var result = await _eventService.SubmitDKPCodeAsync(member.Id, request.EventId, request.DKPCode);
+        return Ok(result);
     }
 }

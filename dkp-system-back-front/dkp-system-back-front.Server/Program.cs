@@ -1,16 +1,21 @@
-﻿using dkp_system_back_front.Server;
+﻿using System.Security.Claims;
+using dkp_system_back_front.Server;
+using dkp_system_back_front.Server.Core.Models.Authorization;
 using dkp_system_back_front.Server.Infrastructure.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 using WebUtilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
-        .AddServices()
+        .AddServices(builder.Configuration)
         //.AddSwagger()
         .ConfigureControllers()
         .AddApplicationDbContext<ApplicationDbContext>(builder.Configuration)
         //.AddRedis(builder.Configuration)
         //.AddRabbit(builder.Configuration)
+        .AddJwtAuthentification(builder.Configuration)
         ;
 
 builder.Services.AddCors(options =>
@@ -42,10 +47,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.ApplyMigrations<ApplicationDbContext>();
+//app.ApplyMigrations<ApplicationDbContext>();
 
 app.UseHttpsRedirection();
 
+app.MapIdentityApi<ApplicationUser>();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

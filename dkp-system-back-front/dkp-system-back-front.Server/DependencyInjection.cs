@@ -12,16 +12,65 @@ using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 using dkp_system_back_front.Server.Core.Services.Interfaces;
 using dkp_system_back_front.Server.Core.Services.Implementations;
+using Microsoft.Extensions.Configuration;
+using dkp_system_back_front.Server.Infrastructure.Data;
+using dkp_system_back_front.Server.Core.Services.Interfaces;
+using dkp_system_back_front.Server.Core.Models.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace dkp_system_back_front.Server;
 public static class DependencyInjection
 {
-    public static IServiceCollection AddServices(this IServiceCollection services)
+    public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<IEventTypeService, EventTypeService>();
         services.AddScoped<IPlayerService, PlayerService>();
+        services.AddScoped<IEventService, EventService>();
+        services.AddScoped<IAuthService, AuthService>();
+
         return services;
     }
+
+    public static IServiceCollection AddJwtAuthentification(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddAuthorization();
+        services.AddAuthentication()
+            .AddCookie(IdentityConstants.ApplicationScheme)
+            .AddBearerToken(IdentityConstants.BearerScheme);
+
+        services.AddIdentityCore<ApplicationUser>()
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddApiEndpoints();
+        /*services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = configuration["Jwt:Issuer"],
+                    ValidAudience = configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!)
+                    )
+                };
+            });*/
+
+        return services;
+    }
+
     public static IServiceCollection AddRabbit(this IServiceCollection services, ConfigurationManager configuration)
     {
         services.AddMassTransit(x =>
@@ -127,12 +176,11 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddApplicationDbContext<TContext>(this IServiceCollection services, ConfigurationManager configuration) where TContext : DbContext
+    public static IServiceCollection AddApplicationDbContext<TContext>(this IServiceCollection services, ConfigurationManager configuration) where TContext : IdentityDbContext<ApplicationUser>
     {
-        ConfigurationManager configuration2 = configuration;
         services.AddDbContext<TContext>(delegate (DbContextOptionsBuilder options)
         {
-            options.UseNpgsql(configuration2.GetConnectionString("Database"), delegate (NpgsqlDbContextOptionsBuilder opt)
+            options.UseNpgsql(configuration.GetConnectionString("Database"), delegate (NpgsqlDbContextOptionsBuilder opt)
             {
                 opt.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             });

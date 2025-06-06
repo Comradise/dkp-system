@@ -1,46 +1,45 @@
-﻿using dkp_system_back_front.Server.Core.Models;
+﻿using dkp_system_back_front.Server.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using dkp_system_back_front.Server.Core.Services.Interfaces;
-using dkp_system_back_front.Server.Infrastructure.Data;
-
-namespace dkp_system_back_front.Server.Core.Services.Implementations;
+using System.Security.Claims;
+using dkp_system_back_front.Server.Core.Models.Internal.Guild;
 
 public class PlayerService : IPlayerService
 {
-    private readonly ApplicationDbContext _db;
+    private readonly ApplicationDbContext _context;
 
-    public PlayerService(ApplicationDbContext db)
+    public PlayerService(ApplicationDbContext context)
     {
-        _db = db;
+        _context = context;
     }
 
-    public Player Add(Player player)
+    public async Task<IEnumerable<Member?>> GetAllAsync()
     {
-        _db.Players.Add(player);
-        _db.SaveChanges();
+        return await _context.Members.ToListAsync();
+    }
 
+    public async Task<Member?> GetByIdAsync(Guid id)
+    {
+        return await _context.Members.FindAsync(id);
+    }
+
+    public async Task<Member> CreateAsync(string nickname)
+    {
+        Member player = new Member()
+        {
+            Nickname = nickname
+        };
+        _context.Members.Add(player);
+        await _context.SaveChangesAsync();
         return player;
     }
 
-    public int Delete(int id)
+    public async Task<Member?> FindByUserIdAsync(string userId)
     {
-        Player? player = _db.Players.Find(id);
-        if (player != null)
-        {
-            _db.Players.Remove(player);
-            _db.SaveChanges();
-            return player.Id;
-        }
+        var player = await _context.Members.FirstOrDefaultAsync(p => p.UserId.ToString() == userId);
 
-        return -1;
-    }
-
-    public IEnumerable<Player> GetAll()
-    {
-        return _db.Players.ToList();
-    }
-
-    public Player? Get(string characterName)
-    {
-        return _db.Players.FirstOrDefault(e => e.CharacterName == characterName);
+        if (player == null)
+            return null;
+        return player;
     }
 }

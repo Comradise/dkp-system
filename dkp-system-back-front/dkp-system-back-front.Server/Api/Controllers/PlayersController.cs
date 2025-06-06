@@ -1,48 +1,38 @@
-﻿using dkp_system_back_front.Server.Core.Models;
-using dkp_system_back_front.Server.Core.Services.Implementations;
+﻿using Microsoft.AspNetCore.Mvc;
+using dkp_system_back_front.Server.Core.Models.Internal;
 using dkp_system_back_front.Server.Core.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace dkp_system_back_front.Server.Api.Controllers;
-[Route("[controller]")]
+
 [ApiController]
+[Route("api/[controller]")]
 public class PlayersController : ControllerBase
 {
-    private readonly ILogger<PlayersController> _logger;
     private readonly IPlayerService _playerService;
 
-    public PlayersController(ILogger<PlayersController> logger, IPlayerService playerService)
+    public PlayersController(IPlayerService playerService)
     {
-        _logger = logger;
         _playerService = playerService;
     }
 
+    [Authorize(AuthenticationSchemes = "Identity.Application")]
     [HttpGet]
-    [Route("GetAll")]
-    public IEnumerable<Player> GetAll()
+    public async Task<IActionResult> GetAll() => Ok(await _playerService.GetAllAsync());
+
+    [Authorize(AuthenticationSchemes = "Identity.Application")]
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(Guid id)
     {
-        return _playerService.GetAll();
+        var player = await _playerService.GetByIdAsync(id);
+        return player == null ? NotFound() : Ok(player);
     }
 
-    [HttpGet]
-    [Route("Get")]
-    public Player? Get(string characterName)
+    [Authorize(AuthenticationSchemes = "Identity.Application")]
+    [HttpPost("Create")]
+    public async Task<IActionResult> Create(string username)
     {
-        return _playerService.Get(characterName);
-    }
-
-    [HttpPost]
-    [Route("Add")]
-    public Player Add(Player player)
-    {
-        return _playerService.Add(player);
-    }
-
-    [HttpDelete]
-    [Route("Delete")]
-    public int Delete(int id)
-    {
-        return _playerService.Delete(id);
+        var created = await _playerService.CreateAsync(username);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 }
