@@ -1,0 +1,85 @@
+<div class="container mt-5">
+  <h1 class="mb-4">Управление игроками</h1>
+
+  <!-- Форма добавления игрока -->
+  <div class="card mb-4">
+    <div class="card-header">Добавить игрока</div>
+    <div class="card-body">
+      <!-- (ngSubmit)="onAddPlayer()" - вызов метода при отправке формы -->
+      <form (ngSubmit)="onAddPlayer()">
+        <div class="mb-3">
+          <label class="form-label" for="firstName">Имя</label>
+          <!-- [(ngModel)] - двусторонняя привязка к переменной в компоненте -->
+          <input id="firstName"
+                 type="text"
+                 class="form-control"
+                 placeholder="Введите имя"
+                 required
+                 [(ngModel)]="firstName"
+                 name="firstName">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="lastName">Фамилия</label>
+          <input id="lastName"
+                 type="text"
+                 class="form-control"
+                 placeholder="Введите фамилию"
+                 required
+                 [(ngModel)]="lastName"
+                 name="lastName">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="characterName">Имя персонажа</label>
+          <input id="characterName"
+                 type="text"
+                 class="form-control"
+                 placeholder="Введите имя персонажа"
+                 required
+                 [(ngModel)]="characterName"
+                 name="characterName">
+        </div>
+        <button type="submit" class="btn btn-primary">Добавить игрока</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Поиск игрока -->
+  <div class="card mb-4">
+    <div class="card-header">Найти игрока по имени персонажа</div>
+    <div class="card-body">
+      <div class="input-group">
+        <input type="text"
+               class="form-control"
+               placeholder="Введите имя персонажа"
+               [(ngModel)]="searchCharacterName"
+               name="searchCharacterName">
+        <!-- (click)="onSearchPlayer()" - вызов метода при клике -->
+        <button (click)="onSearchPlayer()" class="btn btn-secondary">Найти</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Удаление игрока -->
+  <div class="card mb-4">
+    <div class="card-header">Удаление по id персонажа</div>
+    <div class="card-body">
+      <div class="input-group">
+        <input type="text"
+               class="form-control"
+               placeholder="Введите имя персонажа"
+               [(ngModel)]="deleteCharacterId"
+               name="deleteCharacterId">
+        <!-- (click)="onSearchPlayer()" - вызов метода при клике -->
+        <button (click)="onDeletePlayer()" class="btn btn-secondary">Удалить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Кнопка для получения всех игроков -->
+  <div class="mb-4">
+    <button (click)="onGetAllPlayers()" class="btn btn-info">Показать всех игроков</button>
+  </div>
+
+  <!-- Блок для отображения результатов (HTML вставляем через [innerHTML]) -->
+  <div class="mt-4" [innerHTML]="result"></div>
+</div>
