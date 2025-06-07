@@ -6,7 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace dkp_system_back_front.Server.Test;
 
-public class Tests
+[TestFixture]
+public class EventServiceTests
 {
     private ApplicationDbContext _context;
     private EventService _eventService;
@@ -34,7 +35,7 @@ public class Tests
     public async Task SubmitDKPCodeAsync_PlayerNotFound_ReturnsError()
     {
         var result = await _eventService.SubmitDKPCodeAsync(Guid.NewGuid(), Guid.NewGuid(), "code");
-        Assert.AreEqual("Player not found", result);
+        Assert.That(result, Is.EqualTo("Player not found"));
     }
 
     [Test]
@@ -45,7 +46,7 @@ public class Tests
         await _context.SaveChangesAsync();
 
         var result = await _eventService.SubmitDKPCodeAsync(member.Id, Guid.NewGuid(), "code");
-        Assert.AreEqual("Invalid event", result);
+        Assert.That(result, Is.EqualTo("Invalid event"));
     }
 
     [Test]
@@ -65,7 +66,7 @@ public class Tests
         await _context.SaveChangesAsync();
 
         var result = await _eventService.SubmitDKPCodeAsync(member.Id, evt.Id, "wrong-code");
-        Assert.AreEqual("Invalid DKP code", result);
+        Assert.That(result, Is.EqualTo("Invalid DKP code"));
     }
 
     [Test]
@@ -85,7 +86,7 @@ public class Tests
         await _context.SaveChangesAsync();
 
         var result = await _eventService.SubmitDKPCodeAsync(member.Id, evt.Id, "code");
-        Assert.AreEqual("DKP code has expired", result);
+        Assert.That(result, Is.EqualTo("DKP code has expired"));
     }
 
     [Test]
@@ -111,7 +112,7 @@ public class Tests
         await _context.SaveChangesAsync();
 
         var result = await _eventService.SubmitDKPCodeAsync(memberId, eventId, "code");
-        Assert.AreEqual("DKP code already used", result);
+        Assert.That(result, Is.EqualTo("DKP code already used"));
     }
 
     [Test]
@@ -136,11 +137,11 @@ public class Tests
 
         var result = await _eventService.SubmitDKPCodeAsync(memberId, eventId, "code");
 
-        Assert.AreEqual("Success! +25 DKP", result);
+        Assert.That(result, Is.EqualTo("Success! +25 DKP"));
         var attendance = await _context.EventAttendances.FirstOrDefaultAsync(a => a.MemberId == memberId && a.EventId == eventId);
         Assert.IsNotNull(attendance);
 
         var updatedMember = await _context.Members.FindAsync(memberId);
-        Assert.AreEqual(25, updatedMember.Dkp);
+        Assert.That(updatedMember.Dkp, Is.EqualTo(25));
     }
 }
