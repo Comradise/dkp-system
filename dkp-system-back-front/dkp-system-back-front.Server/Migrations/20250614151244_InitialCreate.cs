@@ -4,6 +4,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace dkp_system_back_front.Server.Migrations
 {
     /// <inheritdoc />
@@ -56,7 +58,7 @@ namespace dkp_system_back_front.Server.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -64,17 +66,41 @@ namespace dkp_system_back_front.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Players",
+                name: "Guilds",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Guilds", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "InternalUser",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Username = table.Column<string>(type: "text", nullable: false),
-                    UserId = table.Column<string>(type: "text", nullable: false),
-                    DKP = table.Column<int>(type: "integer", nullable: false)
+                    Email = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Players", x => x.Id);
+                    table.PrimaryKey("PK_InternalUser", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Roles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Roles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -188,12 +214,12 @@ namespace dkp_system_back_front.Server.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    DKPCode = table.Column<string>(type: "text", nullable: false),
+                    EventTypeId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DkpCode = table.Column<string>(type: "character varying(4)", maxLength: 4, nullable: false),
                     Reward = table.Column<int>(type: "integer", nullable: false),
-                    ExpirationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EventTypeId = table.Column<Guid>(type: "uuid", nullable: false)
+                    BeginDT = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ExpirationTime = table.Column<TimeSpan>(type: "interval", nullable: false),
+                    GuildId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -203,6 +229,71 @@ namespace dkp_system_back_front.Server.Migrations
                         column: x => x.EventTypeId,
                         principalTable: "EventTypes",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Events_Guilds_GuildId",
+                        column: x => x.GuildId,
+                        principalTable: "Guilds",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Members",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    GuildId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RoleId = table.Column<int>(type: "integer", nullable: false),
+                    Nickname = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    Dkp = table.Column<int>(type: "integer", nullable: false),
+                    InternalUserId = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Members", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Members_Guilds_GuildId",
+                        column: x => x.GuildId,
+                        principalTable: "Guilds",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Members_InternalUser_InternalUserId",
+                        column: x => x.InternalUserId,
+                        principalTable: "InternalUser",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Members_InternalUser_UserId",
+                        column: x => x.UserId,
+                        principalTable: "InternalUser",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Members_Roles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Roles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Rewards",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    EventId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DkpAmount = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Rewards", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Rewards_Events_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Events",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -211,10 +302,8 @@ namespace dkp_system_back_front.Server.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    PlayerId = table.Column<Guid>(type: "uuid", nullable: false),
                     EventId = table.Column<Guid>(type: "uuid", nullable: false),
-                    SubmittedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    DKPEarned = table.Column<int>(type: "integer", nullable: false)
+                    MemberId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -226,11 +315,20 @@ namespace dkp_system_back_front.Server.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_EventAttendances_Players_PlayerId",
-                        column: x => x.PlayerId,
-                        principalTable: "Players",
+                        name: "FK_EventAttendances_Members_MemberId",
+                        column: x => x.MemberId,
+                        principalTable: "Members",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "GuildLeader" },
+                    { 2, "GuildMember" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -276,15 +374,45 @@ namespace dkp_system_back_front.Server.Migrations
                 column: "EventId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventAttendances_PlayerId_EventId",
+                name: "IX_EventAttendances_MemberId_EventId",
                 table: "EventAttendances",
-                columns: new[] { "PlayerId", "EventId" },
+                columns: new[] { "MemberId", "EventId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Events_EventTypeId",
                 table: "Events",
                 column: "EventTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Events_GuildId",
+                table: "Events",
+                column: "GuildId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Members_GuildId",
+                table: "Members",
+                column: "GuildId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Members_InternalUserId",
+                table: "Members",
+                column: "InternalUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Members_RoleId",
+                table: "Members",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Members_UserId",
+                table: "Members",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Rewards_EventId",
+                table: "Rewards",
+                column: "EventId");
         }
 
         /// <inheritdoc />
@@ -309,19 +437,31 @@ namespace dkp_system_back_front.Server.Migrations
                 name: "EventAttendances");
 
             migrationBuilder.DropTable(
+                name: "Rewards");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
+                name: "Members");
+
+            migrationBuilder.DropTable(
                 name: "Events");
 
             migrationBuilder.DropTable(
-                name: "Players");
+                name: "InternalUser");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
 
             migrationBuilder.DropTable(
                 name: "EventTypes");
+
+            migrationBuilder.DropTable(
+                name: "Guilds");
         }
     }
 }

@@ -1,6 +1,0 @@
-@dkp_system_back_front.Server_HostAddress = http://localhost:5111
-
-GET {{dkp_system_back_front.Server_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

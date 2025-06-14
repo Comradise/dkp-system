@@ -25,11 +25,21 @@ public class GuildServiceTests
         _context = new ApplicationDbContext(options);
         _service = new GuildService(_context);
 
-        // Seed roles
-        _context.Roles.AddRange(
-            new Role { Name = "GuildMember" },
-            new Role { Name = "GuildLeader" }
-        );
+        // Создать роли
+        var roles = new List<Role>
+        {
+            new Role()
+            {
+                Id = 1,
+                Name = "GuildLeader"
+            },
+            new Role()
+            {
+                Id = 2,
+                Name = "GuildMember"
+            }
+        };
+        _context.Roles.AddRange(roles);
         _context.SaveChanges();
     }
 
@@ -37,7 +47,7 @@ public class GuildServiceTests
     public async Task CreateGuild_ShouldCreateGuildAndAssignLeader()
     {
         // Arrange
-        var userId = Guid.NewGuid();
+        var userId = Guid.NewGuid().ToString();
         var nickname = "TestLeader";
 
         // Act
@@ -51,8 +61,7 @@ public class GuildServiceTests
         Assert.IsNotNull(member);
         Assert.That(member.Nickname, Is.EqualTo(nickname));
 
-        var role = _context.Roles.First(r => r.Id == member.RoleId);
-        Assert.That(role.Name, Is.EqualTo("GuildLeader"));
+        Assert.That(member.RoleId, Is.EqualTo(1));
     }
 
     [Test]
@@ -62,7 +71,7 @@ public class GuildServiceTests
         _context.Guilds.Add(guild);
         _context.SaveChanges();
 
-        var userId = Guid.NewGuid();
+        var userId = "test";
 
         var result = await _service.AddNewMember(guild.Id, userId, "Member1");
 
@@ -86,7 +95,7 @@ public class GuildServiceTests
     [Test]
     public async Task DeleteMember_ShouldRemoveMemberFromGuild()
     {
-        var userId = Guid.NewGuid();
+        var userId = "test";
         var guild = new Guild { Id = Guid.NewGuid(), Name = "GuildWithMember" };
         var member = new Member { UserId = userId, GuildId = guild.Id };
         guild.Members.Add(member);

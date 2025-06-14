@@ -1,8 +1,12 @@
-﻿using dkp_system_back_front.Server.Core.Models.Internal.Guild;
+﻿using System.Security.Claims;
+using dkp_system_back_front.Server.Core.Models.Internal.Guild;
 using dkp_system_back_front.Server.Core.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace dkp_system_back_front.Server.Api.Controllers;
+[ApiController]
+[Route("[controller]")]
 public class GuildController : ControllerBase
 {
     private readonly ILogger<GuildController> _logger;
@@ -12,33 +16,45 @@ public class GuildController : ControllerBase
         _logger = logger;
         _guildService = guildService;
     }
-    public async Task<Guild?> Create(string guildName, Guid thisMemberId, string thisMemberNickname)
-    {
-        return await _guildService.CreateGuild(guildName, thisMemberId, thisMemberNickname);
-    }
 
+    [Authorize(AuthenticationSchemes = "Identity.Application")]
+    [HttpPost("create")]
+    public async Task<Guild?> Create(string guildName, string thisMemberNickname)
+    {
+        string userId = HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        return await _guildService.CreateGuild(guildName, userId, thisMemberNickname);
+    }
+    [Authorize(AuthenticationSchemes = "Identity.Application")]
+    [HttpPost("delete")]
     public async Task Delete(Guid guildId)
     {
         await _guildService.DeleteGuild(guildId);
     }
-
+    [Authorize(AuthenticationSchemes = "Identity.Application")]
+    [HttpPost("update")]
     public async Task<Guild?> Update(Guild guild)
     {
         return await _guildService.UpdateGuild(guild);
     }
-
-    public async void DeleteMember(Guid guildId, Guid memberId)
+    [Authorize(AuthenticationSchemes = "Identity.Application")]
+    [HttpPost("delete-member")]
+    public async void DeleteMember(Guid guildId)
     {
-        await _guildService.DeleteMember(guildId, memberId);
+        string userId = HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        await _guildService.DeleteMember(guildId, userId);
     }
-
-    public async Task<Member?> AddNewMember(Guid guildId, Guid internalUserId, string memberNickname)
+    [Authorize(AuthenticationSchemes = "Identity.Application")]
+    [HttpPost("add-new-member")]
+    public async Task<Member?> AddNewMember(Guid guildId, string memberNickname)
     {
-        return await _guildService.AddNewMember(guildId, internalUserId, memberNickname);
+        string userId = HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        return await _guildService.AddNewMember(guildId, userId, memberNickname);
     }
-
-    public async Task<Member?> ChangeRole(Guid guildId, Guid memberId, Role role)
+    [Authorize(AuthenticationSchemes = "Identity.Application")]
+    [HttpPost("change-role")]
+    public async Task<Member?> ChangeRole(Guid guildId, Role role)
     {
-        return await _guildService.ChangeRole(guildId, memberId, role);
+        string userId = HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        return await _guildService.ChangeRole(guildId, userId, role);
     }
 }

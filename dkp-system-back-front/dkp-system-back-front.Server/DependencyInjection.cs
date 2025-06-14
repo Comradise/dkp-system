@@ -14,7 +14,6 @@ using dkp_system_back_front.Server.Core.Services.Interfaces;
 using dkp_system_back_front.Server.Core.Services.Implementations;
 using Microsoft.Extensions.Configuration;
 using dkp_system_back_front.Server.Infrastructure.Data;
-using dkp_system_back_front.Server.Core.Services.Interfaces;
 using dkp_system_back_front.Server.Core.Models.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -31,6 +30,7 @@ public static class DependencyInjection
         services.AddScoped<IPlayerService, PlayerService>();
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IGuildService, GuildService>();
 
         return services;
     }

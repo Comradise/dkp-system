@@ -16,7 +16,7 @@ public class Event
     public Guid GuildId { get; set; }
 
     public EventType EventType { get; set; } = null!;
-    public Guid Guild { get; set; }
+    public Guild.Guild Guild { get; set; }
     public List<EventAttendance> Attendances { get; set; } = new();
     public List<Rewards> Rewards { get; set; } = new();
 }

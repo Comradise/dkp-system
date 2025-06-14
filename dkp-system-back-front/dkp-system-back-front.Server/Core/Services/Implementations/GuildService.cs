@@ -12,13 +12,16 @@ public class GuildService : IGuildService
     {
         _context = context;
     }
-    public async Task<Member> AddNewMember(Guid guildId, Guid internalUserId, string memberNickname)
+    public async Task<Member> AddNewMember(Guid guildId, string internalUserId, string memberNickname)
     {
         Guild? guild = await _context.Guilds.FindAsync(guildId);
         if (guild == null) return null;
-        if (guild.Members.Any(m => m.UserId == internalUserId)) return guild.Members.Find(m => m.UserId == internalUserId);
+        if (guild.Members.Any(m => m.UserId == internalUserId))
+        {
+            return guild.Members.Find(m => m.UserId == internalUserId);
+        }
 
-        Role role = _context.Roles.First(r => r.Name == "GuildMember");
+        Role? role = _context.Roles.FirstOrDefault(r => r.Id == 2);
         Member? member = _context.Members.FirstOrDefault(m => m.UserId == internalUserId && m.GuildId == guildId);
         if (member == null)
         {
@@ -29,35 +32,38 @@ public class GuildService : IGuildService
                 RoleId = role.Id,
                 Nickname = memberNickname
             };
+            await _context.Members.AddAsync(member);
+            await _context.SaveChangesAsync();
         }
-        
-        guild.Members.Add(member);
+
         return member;
     }
 
-    public async Task<Member?> ChangeRole(Guid guildId, Guid memberId, Role role)
+    public async Task<Member?> ChangeRole(Guid guildId, string internalUserId, Role role)
     {
-        Member? member = _context.Members.FirstOrDefault(m => m.Id == memberId && m.GuildId == guildId);
+        Member? member = _context.Members.FirstOrDefault(m => m.UserId == internalUserId && m.GuildId == guildId);
         if (member == null) return null;
 
         member.Role = role;
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
         return member;
     }
 
-    public async Task<Guild?> CreateGuild(string guildName, Guid thisUserId, string thisMemberNickname)
+    public async Task<Guild?> CreateGuild(string guildName, string internalUserId, string thisMemberNickname)
     {
         Guild guild = new Guild()
         {
             Name = guildName
         };
+        List<string> allguilds = _context.Guilds.Select(g => g.Id.ToString()).ToList();
+        string a = string.Join(", ", allguilds);
         await _context.Guilds.AddAsync(guild);
         await _context.SaveChangesAsync();
 
-        Member member = await AddNewMember(guild.Id, thisUserId, thisMemberNickname);
-        Role role = _context.Roles.First(r => r.Name == "GuildLeader");
-        await ChangeRole(guild.Id, member.Id, role);
+        Member member = await AddNewMember(guild.Id, internalUserId, thisMemberNickname);
+        Role role = _context.Roles.First(r => r.Id == 1);
+        await ChangeRole(guild.Id, internalUserId, role);
         return guild;
     }
 
@@ -70,7 +76,7 @@ public class GuildService : IGuildService
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteMember(Guid guildId, Guid internalUserId)
+    public async Task DeleteMember(Guid guildId, string internalUserId)
     {
         Guild? guild = _context.Guilds.FirstOrDefault(r => r.Id == guildId);
         if (guild == null) return;
