@@ -12,15 +12,14 @@ using dkp_system_back_front.Server.Infrastructure.Data;
 namespace dkp_system_back_front.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250519125636_AddIdentity")]
-    partial class AddIdentity
+    [Migration("20250614160854_AddUserMemberConnection")]
+    partial class AddUserMemberConnection
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("identity")
                 .HasAnnotation("ProductVersion", "9.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -49,7 +48,7 @@ namespace dkp_system_back_front.Server.Migrations
                         .IsUnique()
                         .HasDatabaseName("RoleNameIndex");
 
-                    b.ToTable("AspNetRoles", "identity");
+                    b.ToTable("AspNetRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -74,7 +73,7 @@ namespace dkp_system_back_front.Server.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetRoleClaims", "identity");
+                    b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -99,7 +98,7 @@ namespace dkp_system_back_front.Server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserClaims", "identity");
+                    b.ToTable("AspNetUserClaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -121,7 +120,7 @@ namespace dkp_system_back_front.Server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserLogins", "identity");
+                    b.ToTable("AspNetUserLogins", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
@@ -136,7 +135,7 @@ namespace dkp_system_back_front.Server.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetUserRoles", "identity");
+                    b.ToTable("AspNetUserRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -155,7 +154,7 @@ namespace dkp_system_back_front.Server.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("AspNetUserTokens", "identity");
+                    b.ToTable("AspNetUserTokens", (string)null);
                 });
 
             modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Authorization.ApplicationUser", b =>
@@ -219,31 +218,31 @@ namespace dkp_system_back_front.Server.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.ToTable("AspNetUsers", "identity");
+                    b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.Event", b =>
+            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.Event.Event", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("DKPCode")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Date")
+                    b.Property<DateTime>("BeginDT")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DkpCode")
+                        .IsRequired()
+                        .HasMaxLength(4)
+                        .HasColumnType("character varying(4)");
 
                     b.Property<Guid>("EventTypeId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("ExpirationDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<TimeSpan>("ExpirationTime")
+                        .HasColumnType("interval");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("GuildId")
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Reward")
                         .HasColumnType("integer");
@@ -252,35 +251,50 @@ namespace dkp_system_back_front.Server.Migrations
 
                     b.HasIndex("EventTypeId");
 
-                    b.ToTable("Events", "identity");
+                    b.HasIndex("GuildId");
+
+                    b.ToTable("Events");
                 });
 
-            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.EventAttendance", b =>
+            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.Event.EventAttendance", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("DKPEarned")
-                        .HasColumnType("integer");
-
                     b.Property<Guid>("EventId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("PlayerId")
+                    b.Property<Guid>("MemberId")
                         .HasColumnType("uuid");
-
-                    b.Property<DateTime>("SubmittedAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EventId");
 
-                    b.HasIndex("PlayerId", "EventId")
+                    b.HasIndex("MemberId", "EventId")
                         .IsUnique();
 
-                    b.ToTable("EventAttendances", "identity");
+                    b.ToTable("EventAttendances");
+                });
+
+            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.Event.Rewards", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("DkpAmount")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.ToTable("Rewards");
                 });
 
             modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.EventType", b =>
@@ -291,33 +305,92 @@ namespace dkp_system_back_front.Server.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("EventTypes", "identity");
+                    b.ToTable("EventTypes");
                 });
 
-            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.Player", b =>
+            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.Guild.Guild", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("DKP")
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Guilds");
+                });
+
+            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.Guild.Member", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Dkp")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("GuildId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Nickname")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<int>("RoleId")
                         .HasColumnType("integer");
 
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Username")
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Members");
+                });
+
+            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.Guild.Role", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Players", "identity");
+                    b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "GuildLeader"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "GuildMember"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -371,44 +444,114 @@ namespace dkp_system_back_front.Server.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.Event", b =>
+            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.Event.Event", b =>
                 {
                     b.HasOne("dkp_system_back_front.Server.Core.Models.Internal.EventType", "EventType")
-                        .WithMany()
+                        .WithMany("Events")
                         .HasForeignKey("EventTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("dkp_system_back_front.Server.Core.Models.Internal.Guild.Guild", "Guild")
+                        .WithMany("Events")
+                        .HasForeignKey("GuildId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("EventType");
+
+                    b.Navigation("Guild");
                 });
 
-            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.EventAttendance", b =>
+            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.Event.EventAttendance", b =>
                 {
-                    b.HasOne("dkp_system_back_front.Server.Core.Models.Internal.Event", "Event")
+                    b.HasOne("dkp_system_back_front.Server.Core.Models.Internal.Event.Event", "Event")
                         .WithMany("Attendances")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("dkp_system_back_front.Server.Core.Models.Internal.Player", "Player")
+                    b.HasOne("dkp_system_back_front.Server.Core.Models.Internal.Guild.Member", "Member")
                         .WithMany("Attendances")
-                        .HasForeignKey("PlayerId")
+                        .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Event");
 
-                    b.Navigation("Player");
+                    b.Navigation("Member");
                 });
 
-            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.Event", b =>
+            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.Event.Rewards", b =>
+                {
+                    b.HasOne("dkp_system_back_front.Server.Core.Models.Internal.Event.Event", "Event")
+                        .WithMany("Rewards")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.Guild.Member", b =>
+                {
+                    b.HasOne("dkp_system_back_front.Server.Core.Models.Internal.Guild.Guild", "Guild")
+                        .WithMany("Members")
+                        .HasForeignKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("dkp_system_back_front.Server.Core.Models.Internal.Guild.Role", "Role")
+                        .WithMany("Members")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("dkp_system_back_front.Server.Core.Models.Authorization.ApplicationUser", "User")
+                        .WithMany("Members")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Guild");
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Authorization.ApplicationUser", b =>
+                {
+                    b.Navigation("Members");
+                });
+
+            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.Event.Event", b =>
+                {
+                    b.Navigation("Attendances");
+
+                    b.Navigation("Rewards");
+                });
+
+            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.EventType", b =>
+                {
+                    b.Navigation("Events");
+                });
+
+            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.Guild.Guild", b =>
+                {
+                    b.Navigation("Events");
+
+                    b.Navigation("Members");
+                });
+
+            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.Guild.Member", b =>
                 {
                     b.Navigation("Attendances");
                 });
 
-            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.Player", b =>
+            modelBuilder.Entity("dkp_system_back_front.Server.Core.Models.Internal.Guild.Role", b =>
                 {
-                    b.Navigation("Attendances");
+                    b.Navigation("Members");
                 });
 #pragma warning restore 612, 618
         }

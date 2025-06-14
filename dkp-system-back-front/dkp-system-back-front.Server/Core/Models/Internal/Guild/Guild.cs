@@ -4,7 +4,7 @@ namespace dkp_system_back_front.Server.Core.Models.Internal.Guild;
 
 public class Guild
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = string.Empty;
 
     public List<Member> Members { get; set; } = new();

@@ -62,7 +62,7 @@ public class PlayerServiceTests
     [Test]
     public async Task FindByUserIdAsync_ShouldReturnMember()
     {
-        var userId = Guid.NewGuid();
+        var userId = "test";
         _context.Members.Add(new Member { UserId = userId, Nickname = "ById" });
         _context.SaveChanges();
 
