@@ -40,11 +40,11 @@ app.UseCors("AllowAll");
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
 //app.ApplyMigrations<ApplicationDbContext>();
 
