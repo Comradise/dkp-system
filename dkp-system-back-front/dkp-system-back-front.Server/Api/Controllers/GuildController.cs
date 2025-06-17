@@ -28,12 +28,22 @@ public class GuildController : ControllerBase
     [HttpPost("delete")]
     public async Task Delete(Guid guildId)
     {
+        string userId = HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        Role? role = _guildService.GetRole(guildId, userId);
+        if (role == null) return;
+        if (role.Id != 1) return;
+
         await _guildService.DeleteGuild(guildId);
     }
     [Authorize(AuthenticationSchemes = "Identity.Application")]
     [HttpPost("update")]
     public async Task<Guild?> Update(Guild guild)
     {
+        string userId = HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        Role? role = _guildService.GetRole(guild.Id, userId);
+        if (role == null) return null;
+        if (role.Id != 1) return null;
+
         return await _guildService.UpdateGuild(guild);
     }
     [Authorize(AuthenticationSchemes = "Identity.Application")]
@@ -41,6 +51,10 @@ public class GuildController : ControllerBase
     public async void DeleteMember(Guid guildId)
     {
         string userId = HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        Role? role = _guildService.GetRole(guildId, userId);
+        if (role == null) return;
+        if (role.Id != 1) return;
+
         await _guildService.DeleteMember(guildId, userId);
     }
     [Authorize(AuthenticationSchemes = "Identity.Application")]
@@ -48,6 +62,10 @@ public class GuildController : ControllerBase
     public async Task<Member?> AddNewMember(Guid guildId, string memberNickname)
     {
         string userId = HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        Role? role = _guildService.GetRole(guildId, userId);
+        if (role == null) return null;
+        if (role.Id != 1) return null;
+
         return await _guildService.AddNewMember(guildId, userId, memberNickname);
     }
     [Authorize(AuthenticationSchemes = "Identity.Application")]
@@ -55,6 +73,10 @@ public class GuildController : ControllerBase
     public async Task<Member?> ChangeRole(Guid guildId, Role role)
     {
         string userId = HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        Role? userRole = _guildService.GetRole(guildId, userId);
+        if (userRole == null) return null;
+        if (userRole.Id != 1) return null;
+
         return await _guildService.ChangeRole(guildId, userId, role);
     }
 }

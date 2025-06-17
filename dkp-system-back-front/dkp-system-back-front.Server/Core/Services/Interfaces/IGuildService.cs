@@ -11,4 +11,5 @@ public interface IGuildService
     public Guild? FindGuild(Guid guildId);
     public Task<Guild?> UpdateGuild(Guild guild);
     public Task<Member?> ChangeRole(Guid guildId, string internalUserId, Role role);
+    public Role? GetRole(Guid guildId, string internalUserId);
 }

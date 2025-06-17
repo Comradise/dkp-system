@@ -2,6 +2,7 @@
 using dkp_system_back_front.Server.Core.Services.Interfaces;
 using dkp_system_back_front.Server.Infrastructure.Data;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 
 namespace dkp_system_back_front.Server.Core.Services.Implementations;
 
@@ -91,6 +92,11 @@ public class GuildService : IGuildService
     public Guild? FindGuild(Guid guildId)
     {
         return _context.Guilds.FirstOrDefault(g => g.Id == guildId);
+    }
+
+    public Role? GetRole(Guid guildId, string internalUserId)
+    {
+        return _context.Guilds.FirstOrDefault(g => g.Id == guildId)?.Members.FirstOrDefault(m => m.UserId == internalUserId)?.Role;
     }
 
     public async Task<Guild?> UpdateGuild(Guild guild)
